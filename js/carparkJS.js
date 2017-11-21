@@ -10,10 +10,10 @@ function updateLots() {
       for (var i = 0; i < myObj.value.length; i++) {
         //if lot is not displayed due to google api limitation reached
         //skip the lot
-        if (document.getElementById("lot" + (i + 1)) === null) {
+        if (document.getElementById("res-lots" + (i)) === null) {
           continue;
         } else {
-          document.getElementById("lot" + (i + 1)).innerHTML = myObj.value[i].Lots;
+          document.getElementById("res-lots" + (i)).innerHTML = myObj.value[i].Lots;
         }
 
       }
@@ -47,7 +47,7 @@ function initialLoad(){
           + "<a class='results-header hide-overflow' href=carpark.php?carparkId=" + cpArray[i]['carparkId'] + ">" + location + "</a>"
           + "<span class='res-food-subheader'>Lots Available</span>"
           + "<a href='carpark.php?carparkId="  + cpArray[i]['carparkId'] +  "' class='res-blocks'>"
-          + "<span class='res-lots'>" + lots + "</span>"
+          + "<span class='res-lots" + i + "'>" + lots + "</span>"
           + "<span class='res-name res-single hide-overflow'>" + location + "</span>"
           + "</a>"
           + "<a class='res-more' href=carpark.php?carparkId=" + cpArray[i]['carparkId'] + ">View more <i class='fa fa-caret-right' aria-hidden='true'></i></a></div>"
@@ -89,25 +89,24 @@ function listResult(x,y){
     }
     document.getElementById("res-carpark-cont").innerHTML = "";
     for (var i = startIndex; i < endIndex; i++){
-        var lat = cpArray[i][2];
-        var lng = cpArray[i][1];
+        var lat = cpArray[i]['latitude'];
+        var lng = cpArray[i]['longitude'];
         var lots = cpJson[i];
-        var location = cpArray[i][4];
+        var location = cpArray[i]['development'];
         document.getElementById("res-carpark-cont").innerHTML += "<li class='res-row-food'>"
-        + "<a class='res-food-img' href=carpark.php?carparkId=" + cpArray[i][0] + ">"
-        + "<img src=http://ctjsctjs.com/" + cpArray[i][5] + ">"
+        + "<a class='res-food-img' href=carpark.php?carparkId=" + cpArray[i]['carparkId'] + ">"
+        + "<img src=http://ctjsctjs.com/" + cpArray[i]['image'] + ">"
         + "</a>"
         + "<div class='res-food'>"
-        + "<a class='results-header hide-overflow' href=carpark.php?carparkId=" + cpArray[i][0] + ">" + location + "</a>"
+        + "<a class='results-header hide-overflow' href=carpark.php?carparkId=" + cpArray[i]['carparkId'] + ">" + location + "</a>"
         + "<span class='res-food-subheader'>Lots Available</span>"
-        + "<a href='carpark.php?carparkId="  + cpArray[i][0] +  "' class='res-blocks'>"
-        + "<span class='res-lots'>" + lots + "</span>"
+        + "<a href='carpark.php?carparkId="  + cpArray[i]['carparkId'] +  "' class='res-blocks'>"
+        + "<span class='res-lots" + i + "'>" + lots + "</span>"
         + "<span class='res-name res-single hide-overflow'>" + location + "</span>"
         + "</a>"
-        + "<a class='res-more' href=carpark.php?carparkId=" + cpArray[i][0] + ">View more <i class='fa fa-caret-right' aria-hidden='true'></i></a></div>"
+        + "<a class='res-more' href=carpark.php?carparkId=" + cpArray[i]['carparkId'] + ">View more <i class='fa fa-caret-right' aria-hidden='true'></i></a></div>"
         + "</li>";
     }
-
 }
 
 $( document ).ready(function() {

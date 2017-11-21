@@ -35,24 +35,20 @@ if (isset($_SESSION['FIRSTNAME'])) {
         $currentPage = 1;
 
         if ($rowcount > 0) {
-          
-          echo '<ul class="results-container" id="res-carpark-cont">';
-          echo 'step1';
+
+          echo "<ul class='results-container' id='res-carpark-cont'>";
           $storedResult = array();
-          echo 'step2';
           $carparkJsonResult = array();
-          echo 'step3';
 
           for ($i = 0; $i < $rowcount; $i++) {
               $row = mysqli_fetch_assoc($result);
               array_push($storedResult, $row);
-              $tempLot = getLots($row,$datamallKey);
+              $tempLot = getLots($row, $datamallKey);
               array_push($carparkJsonResult,$tempLot);
           }
-          echo 'step4';
         }
 
-        echo '</ul>';
+        echo "</ul>";
         echo "<div class='page-row load'>";
         echo "<a onclick='prevPage()' class='page-arrow'><i class='fa fa-caret-left' aria-hidden='true'></i></a>";
         echo "<span class='inline-text' id='carparksCurrentPage'>" . $currentPage . "</span>";
@@ -76,4 +72,5 @@ var cpJson = <?php echo  json_encode($carparkJsonResult);?>;
 <script type="text/javascript" src="js/lot-color.js"></script>
 <script type="text/javascript" src="js/loader.js"></script>
 
-<script>initialLoad();</script>
+<script>initialLoad();
+updateLots();</script>

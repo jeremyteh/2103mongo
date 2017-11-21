@@ -1,22 +1,22 @@
 <?php
 
 	// For localhost
-	//$dbServerName = "localhost";
+	// $dbServerName = "localhost";
 
 	// For Alicloud
 	$dbServerName = "47.74.176.36";
-	
+
 	$dbUserName = "root";
 
 	// For localhost
-	//$dbPassword = "";
+	$dbPassword = "";
 
 	// For Alicloud
 	$dbPassword = "foobar123!";
-	
-	$dbName = "foodfinderapp";
 
+	$dbName = "foodfinderapp";
+	
 	$googleKey = 'AIzaSyDbEqIHfTZwLD9cgm9-elubEhOCm7_C3VE';
 	$datamallKey = 'SFHPvNC5RP+jFTzftMxxFQ==';
 
-	$conn = mysqli_connect($dbServerName, $dbUserName, $dbPassword, $dbName);
+	$conn = mysqli_connect($dbServer, $dbUserName, $dbPassword, $dbName);
