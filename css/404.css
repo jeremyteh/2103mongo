@@ -1,0 +1,32 @@
+.error-page{
+  min-height:100vh;
+  text-align: center;
+}
+
+.error-page img{
+  max-width:200px;
+  width:100%;
+  margin-bottom: 50px;
+}
+
+.error-page h1{
+  text-align: center;
+  color:888;
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.error-return{
+  font-size: 13px;
+  color: #444;
+}
+
+.error-return a{
+  text-decoration: none;
+  color: #ff7c7c;
+  font-weight: 700;
+}
+
+.error-return a:hover{
+  color: #ff5555;
+}

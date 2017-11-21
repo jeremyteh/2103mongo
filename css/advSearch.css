@@ -1,0 +1,36 @@
+.adv-search-cont{
+  width:100%;
+  z-index: 10;
+  text-align: center;
+  border-bottom: 1px solid #efefef;
+}
+
+.adv-search-inner{
+  max-width: 400px;
+  margin: 40px auto 100px;
+}
+
+.slider-wrapper{
+  margin-top:20px;
+}
+
+.res-slider-subheader{
+  font-size:13px;
+  width:100%;
+  border-bottom: 1px solid #efefef;
+  padding: 5px 0;
+  margin-bottom:5px;
+  color: #888;
+}
+
+.slidecontainer{
+  margin-bottom: 20px;
+}
+
+.slider-form{
+  margin-bottom:20px;
+}
+
+#slider-btn{
+  float:right;
+}

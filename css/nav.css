@@ -1,0 +1,151 @@
+
+/*NAVIGATION*/
+
+.nav{
+  padding-top:10px;
+  background-color: white;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  box-shadow: 0 0px 5px 0 rgba(0,0,0,0.2);
+  z-index:1;
+}
+
+.nav-push{
+  height:60px;
+  display:block;
+  width:100%;
+}
+
+.nav-logo{
+  z-index:10;
+  margin-top:3px;
+  height: 40px;
+  float:left;
+}
+
+.nav-logo:hover{
+  filter: brightness(0.9);
+}
+
+.nav-button-container{
+  float:right
+}
+
+.nav-center{
+  text-align: center;
+  list-style-type: none;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+
+.nav-centerlinks{
+  z-index:-1;
+  position:absolute;
+  width:100%;
+}
+
+
+.nav-center li{
+  display:inline-block;
+  height: 100%;
+  padding: 12px 14px;
+}
+
+.nav-right{
+  float:right;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.nav-right li{
+  height: 100%;
+  float:left;
+}
+
+#nav-profile{
+  padding: 12px 20px;
+}
+
+nav ul li a, nav ul li a:visited{
+  text-decoration: none;
+  color:#aaa;
+  font-weight:700;
+  font-size:13px;
+  -webkit-transition: 100ms ease;
+  transition: 100ms ease;
+}
+
+nav ul li a:hover, nav ul li a:active{
+  text-decoration: none;
+  color:#444;
+  font-size:13px;
+  -webkit-transition: 100ms ease;
+  transition: 100ms ease;
+}
+
+nav .modal-loginBtn{
+  margin-right:12px;
+}
+
+nav .modal-loginBtn{
+  margin-right: 12px;
+  float: right;
+}
+
+nav .modal-registerBtn{
+  float: right;
+}
+
+#nav-user{
+  z-index:10;
+}
+
+#nav-hamburger{
+  display:none;
+  cursor: pointer;
+  font-size:25px;
+  margin-top:8px;
+  color: #ff7c7c;
+}
+
+.nav-mobile-user{
+  display:none !important;
+  text-align: center;
+}
+
+.nav-mobile-user a{
+  width:100%;
+  margin-right: 0;
+  cursor: pointer;
+}
+
+#nav-mobile-logout{
+  display:none;
+}
+
+#nav-mobile-logout form button{
+  background:transparent;
+  text-decoration: none;
+  color:#aaa;
+  font-weight:700;
+  font-size:13px;
+  -webkit-transition: 100ms ease;
+  transition: 100ms ease;
+  cursor: pointer;
+}
+
+#nav-mobile-logout form button:hover{
+  text-decoration: none;
+  color:#444;
+  font-size:13px;
+  -webkit-transition: 100ms ease;
+  transition: 100ms ease;
+}
