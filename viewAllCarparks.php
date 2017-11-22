@@ -43,7 +43,7 @@ if (isset($_SESSION['FIRSTNAME'])) {
 
           foreach($rows as $indivCarpark) {
               array_push($storedResult, $indivCarpark);
-              $tempLot = getLots($indivCarpark, $datamallKey);
+              $tempLot = getCarparkLots($indivCarpark, $datamallKey);
               array_push($carparkJsonResult,$tempLot);
           }
         }

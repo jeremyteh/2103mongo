@@ -26,7 +26,7 @@ if(!empty($rows)) { ?>
   </div>
   <?php
   foreach ($rows as $indivFoodEstablishment) {
-    
+
     array_push($storedResult, $indivFoodEstablishment);
   }
 } else {

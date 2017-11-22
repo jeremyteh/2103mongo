@@ -24,4 +24,24 @@ function getLots($locateRow, $key){
   //return (rand(0,10));
 }
 
+function getCarparkLots($locateRow, $key){
+  $carparkLotsJson = "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailability";
+  $ch = curl_init( $carparkLotsJson );
+  $options = array(
+    CURLOPT_HTTPHEADER => array( "AccountKey: ". $key . ", Accept: application/json" ),
+  );
+  curl_setopt_array( $ch, $options );
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+  $carparkJsonResult = curl_exec( $ch );
+  $carparkJsonResult = json_decode($carparkJsonResult);
+  for ($i = 0; $i < count($carparkJsonResult->{'value'}); $i ++){
+      if ($carparkJsonResult->{'value'}[$i]->{'CarParkID'} == $locateRow->carparkId){
+          return ($carparkJsonResult->{'value'}[$i]->{'Lots'});
+      } else {
+        continue;
+      }
+  }
+  //return (rand(0,10));
+}
+
 ?>
