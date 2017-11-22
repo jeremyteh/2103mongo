@@ -29,48 +29,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if($valid == True){
 
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $filter = ['email'=>$_POST['email']];
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $selectUser = " SELECT user.*, COUNT(admin.userId) AS isAdmin FROM user LEFT JOIN admin ON user.userId = admin.userId  WHERE email = '$email'  GROUP BY user.userId";
+    $query = new \MongoDB\Driver\Query($filter);
+    $rows = $mongodbManager->executeQuery('foodfinderapp.user', $query);
 
-    $result = mysqli_query($conn, $selectUser) or die(mysqli_connect_error());
-    $row = mysqli_fetch_array($result);
-    $resultCheck = mysqli_num_rows($result);
+    $userRecord = current($rows->toArray());
 
-    echo $resultCheck;
-
-    if($resultCheck < 1) {
+    if($userRecord == null) {
       $url .= '&loginEmail=invalid';
       $_POST['email'] = "";
       $_POST['password'] = "";
     }
-
-    if($row['accountActivated']==0) {
+    else if($userRecord->accountActivated == false) {
       $url .= '&loginEmail=notActivated';
       $_POST['email'] = "";
       $_POST['password'] = "";
     }
-
     else {
-
-      if($row) {
-        $hashedPwdCheck = password_verify($password, $row['password']);
-        if($hashedPwdCheck == false) {
+      $hashedPwdCheck = password_verify($_POST['password'], $userRecord->password);
+      if($hashedPwdCheck == false) {
           $url .= '&loginPw=invalid';
           $_POST['email'] = "";
           $_POST['password'] = "";
-        }
-        else if($hashedPwdCheck == true) {
+      }
+      else {
           session_start();
-          $_SESSION['FIRSTNAME'] = $row['firstName'];
-          $_SESSION['LASTNAME'] = $row['lastName'];
-          $_SESSION['EMAIL'] = $row['email'];
-          $_SESSION['PASSWORD'] = $row['password'];
-          $_SESSION['ID'] = $row['userId'];
-          $_SESSION['IsAdmin'] = $row['isAdmin'];
-        }
+          $_SESSION['FIRSTNAME'] = $userRecord->firstName;
+          $_SESSION['LASTNAME'] = $userRecord->lastName;
+          $_SESSION['EMAIL'] = $userRecord->email;
+          $_SESSION['PASSWORD'] = $userRecord->password;
+          $_SESSION['ID'] = $userRecord->_id;
+          if ($userRecord->type == "AD")
+            $_SESSION['IsAdmin'] = 1;
+          else
+            $_SESSION['IsAdmin'] = 0;
       }
     }
   }

@@ -27,25 +27,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 	// else if the email field is not empty check if the email is unique
 	else if (!empty($_POST["email"])) {
-		$checkUniqueEmail = "SELECT * FROM user";
-		$result = mysqli_query($conn, $checkUniqueEmail) or die(mysqli_connect_error());
-		for ($i = 0; $i < mysqli_num_rows($result); $i++) {
-			$row = mysqli_fetch_array($result);
-			if (strtoupper($row['email']) == strtoupper($_POST["email"])) {
-				$emailExist = True;
-			}
+		$filter = ['email'=>$_POST["email"]];
+		$query = new \MongoDB\Driver\Query($filter);
+		$rows = $mongodbManager->executeQuery('foodfinderapp.user', $query);
+
+		$userRecord = current($rows->toArray());
+
+		if($userRecord != null) {
+			$emailExist = True;
 		}
+
 		if($emailExist == False) {
-		$url .= "&resetEmail=notExist";
+			$url .= "&resetEmail=notExist";
 			$_POST["email"] = "";
 			$valid = False;
 		}
 	}
 
-	// if there are no errors in the sign up form, it will proceed to insert the user information into the database
-	if($valid==True){
+	// if there are no errors in the forget password form, it will proceed to send the email to the user
+	if(($valid==True) and ($emailExist == True)){
 
-		$email = mysqli_real_escape_string($conn, $_POST['email']);
+		$firstName = $userRecord->firstName;
 		include_once("../phpForgetPasswordMailer.php");
 		header("Location: ../index.php?message=resetSent");
 	} else{

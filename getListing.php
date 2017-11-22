@@ -1,29 +1,34 @@
 <?php
 include_once 'protected/databaseconnection.php';
+
 if (isset($_GET['sort'])) {
   $sortValue = $_GET['sort'];
   if ($sortValue == 0) {
-    $query = "SELECT * FROM foodestablishment ORDER BY name ASC";
+    $filter = array();
+    $options = array("sort" => array("name" => 1));
+    $query = new \MongoDB\Driver\Query($filter, $options);
   } elseif ($sortValue == 1) {
-    $query = "SELECT * FROM foodestablishment ORDER BY name DESC";
+    $filter = array();
+    $options = array("sort" => array("name" => -1));
+    $query = new \MongoDB\Driver\Query($filter, $options);
   }
 } else {
-  $query = "SELECT * FROM foodestablishment";
+  $query = new \MongoDB\Driver\Query([]);
 }
+$rows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
 
 $storedResult = array();
 
-if ($result = mysqli_query($conn, $query) or die(mysqli_connect_error())) {
-  $rowcount = mysqli_num_rows($result); ?>
+if(!empty($rows)) { ?>
 
-<span class= "results-total">Total results found: <span class="inline-text" id='feTotalResults'><?php echo $rowcount; ?></span></span>
-<div id = 'feListing'>
-</div>
-<?php
-for ($i = 0; $i < $rowcount; $i++) {
-  $row = mysqli_fetch_array($result, MYSQLI_NUM);
-  array_push($storedResult, $row);
-}
+  <span class= "results-total">Total results found: <span class="inline-text" id='feTotalResults'><?php echo count($rows); ?></span></span>
+  <div id = 'feListing'>
+  </div>
+  <?php
+  foreach ($rows as $indivFoodEstablishment) {
+    
+    array_push($storedResult, $indivFoodEstablishment);
+  }
 } else {
   ?>
   <span id='feTotalResults'>0</span>

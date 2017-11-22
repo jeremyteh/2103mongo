@@ -40,19 +40,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$valid = False;
 	}
 
-	// if there are no errors in the sign up form, it will proceed to insert the user information into the database
+	// if there are no errors in the reset password  form, it will proceed to update the user password into the database
 	if($valid==True){
 
-		$email = mysqli_real_escape_string($conn, $_POST['email']);
-		echo $email;
-		$passwordConfirm = mysqli_real_escape_string($conn, $_POST['passwordConfirm']);
-		echo $passwordConfirm;
-
 		// hash the password
-		$hashedPassword = password_hash($passwordConfirm, PASSWORD_DEFAULT);
+		$hashedPassword = password_hash($_POST["passwordConfirm"], PASSWORD_DEFAULT);
 
-		$updateAccount = "UPDATE user SET password = '$hashedPassword' WHERE email='$email'";
-		mysqli_query($conn, $updateAccount) or die(mysqli_connect_error());
+		$bulk = new MongoDB\Driver\BulkWrite();
+
+		$bulk->update(['email' => $_POST['email']], ['$set' => ['password' => $hashedPassword]], ['multi' => false, 'upsert' => false]);
+
+		try {
+			$result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
+		} catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+			$result = var_dump($e->getWriteResult());
+		}	
 
 		$_POST["password"] = '';
 		$_POST['passwordConfirm'] = '';

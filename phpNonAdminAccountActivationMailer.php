@@ -18,27 +18,27 @@ $mail->SMTPAuth = true;
 $mail->Username = "jeremyteh8@gmail.com"; // SMTP username
 $mail->Password = "jtys#2804"; // SMTP password
 $mail->setFrom("jeremyteh8@gmail.com");  //add sender email address.
-$mail->AddAddress("$email");
+$mail->AddAddress($_POST["email"]);
 $mail->WordWrap = 50; // set word wrap
 
 
 
 $mail->IsHTML(true); // set email format to HTML
-$mail->Subject = 'Food Finder App Email Verification';
+$mail->Subject = 'Foodpark Email Verification';
 
-$message = 'Dear '.$firstName.',<br><br>
+$message = 'Dear '.$_POST["firstName"].',<br><br>
 
 Thank you for signing up with Foodpark!<br><br>
 
 Your account has been created, you can login with the following credentials after you have activated your account by pressing on the url below.<br><br>
 
 -------------------------<br>
-Email: '.$email.'<br>
-Password: '.$passwordConfirm.'<br>
+Email: '.$_POST["email"].'<br>
+Password: '.$_POST["passwordConfirm"].'<br>
 -------------------------<br><br>
 
 Please click this link to activate your account:<br>
-http://localhost/2103/foodfinderapp/userAccountVerification.php?email='.$email.'&hash='.$hash.'<br><br>
+http://localhost/2103mongo/userAccountVerification.php?email='.$_POST["email"].'&hash='.$hash.'<br><br>
 
 ';
 

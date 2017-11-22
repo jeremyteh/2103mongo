@@ -46,15 +46,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 	// else if the email field is not empty check if the email is unique
 	else if (!empty($_POST["email"])) {
-		$checkUniqueEmail = "SELECT * FROM user";
-		$result = mysqli_query($conn, $checkUniqueEmail) or die(mysqli_connect_error());
-		for ($i = 0; $i < mysqli_num_rows($result); $i++) {
-			$row = mysqli_fetch_array($result);
-			if (strtoupper($row['email']) == strtoupper($_POST["email"])) {
-				$url .=  "&regEmail=exist";
-				$_POST["email"] = "";
-				$valid = False;
-			}
+
+		$filter = ['email'=>$_POST["email"]];
+		$query = new \MongoDB\Driver\Query($filter);
+		$rows = $mongodbManager->executeQuery('foodfinderapp.user', $query);
+
+		if(current($rows->toArray())) {
+			$url .=  "&regEmail=exist";
+			$_POST["email"] = "";
+			$valid = False;
 		}
 	}
 	//=====================  password validation ==========================
@@ -85,48 +85,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 	// if there are no errors in the sign up form, it will proceed to insert the user information into the database
 	if($valid==True){
-		$firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
-		$lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
-		$email = mysqli_real_escape_string($conn, $_POST['email']);
-		$passwordConfirm = mysqli_real_escape_string($conn, $_POST['passwordConfirm']);
+				
 		// hash the password
-		$hashedPassword = password_hash($passwordConfirm, PASSWORD_DEFAULT);
+		$hashedPassword = password_hash($_POST['passwordConfirm'], PASSWORD_DEFAULT);
 		$hash = md5(rand(0,1000));
-		$insertUser = "INSERT INTO user(firstName, lastName, email, password, hash)VALUES('$firstName', '$lastName ', '$email', '$hashedPassword', '$hash')";
-		mysqli_query($conn, $insertUser) or die(mysqli_connect_error());
-		$selectUser = "SELECT userId FROM user WHERE firstName = '$firstName' AND lastName = '$lastName'";
-		$result = mysqli_query($conn, $selectUser) or die(mysqli_connect_error());
-		$resultCheck = mysqli_num_rows($result);
+		
+		$bulk = new MongoDB\Driver\BulkWrite();
 
 		// Just some random code for website admin
 		if($_POST['refCode'] == 2103) {
-			if($resultCheck == 1) {
-				while($row = mysqli_fetch_assoc($result)) {
-					$insertWebAdmin = "INSERT INTO admin(userId, role)VALUES('".$row['userId']."', 'website admin')";
-					mysqli_query($conn, $insertWebAdmin) or die(mysqli_connect_error());
-				}
-				include_once("../phpAdminAccountActivationMailer.php");
-			}
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'role'=>'website admin', 'type'=>'AD']);
+			try {
+			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
+			    include_once("../phpAdminAccountActivationMailer.php");
+			} catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+			    $result = var_dump($e->getWriteResult());
+			}		
 		}
 		// Just some random code for food blogger
 		else if($_POST['refCode'] == 3012) {
-			if($resultCheck == 1) {
-				while($row = mysqli_fetch_assoc($result)) {
-					$insertBlogger = "INSERT INTO admin(userId, role)VALUES('".$row['userId']."', 'food blogger')";
-					mysqli_query($conn, $insertBlogger) or die(mysqli_connect_error());
-				}
-				include_once("../phpAdminAccountActivationMailer.php");
-			}
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'role'=>'food blogger', 'type'=>'AD']);
+			try {
+			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
+			    include_once("../phpAdminAccountActivationMailer.php");
+			} catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+			    $result = var_dump($e->getWriteResult());
+			}			
 		}
 		else {
-			if($resultCheck == 1) {
-				while($row = mysqli_fetch_assoc($result)) {
-					$insertNonAdmin = "INSERT INTO nonadmin(userId)VALUES('".$row['userId']."')";
-					mysqli_query($conn, $insertNonAdmin) or die(mysqli_connect_error());
-				}
-				include_once("../phpNonAdminAccountActivationMailer.php");
-			}
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'type'=>'NAD']);
+			try {
+			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
+			    include_once("../phpNonAdminAccountActivationMailer.php");
+			} catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+			    $result = var_dump($e->getWriteResult());
+			}			
 		}
+
 		$_POST['firstName'] = '';
 		$_POST['lastName'] = '';
 		$_POST['email'] = '';

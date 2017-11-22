@@ -27,23 +27,23 @@ if (isset($_SESSION['FIRSTNAME'])) {
     <div class="container-results">
       <div class="loader"></div>
       <?php
-      $query = "SELECT * FROM carpark";
-      if ($result = mysqli_query($conn, $query) or die(mysqli_connect_error)) {
-        $rowcount = mysqli_num_rows($result);
-        echo "<p hidden id='carparkCounts'>" . $rowcount . "</p>";
-        $pageCount = ceil($rowcount / 24);
+
+        $query = new \MongoDB\Driver\Query([]);
+        $rows = $mongodbManager->executeQuery('foodfinderapp.carpark', $query)->toArray();
+
+        echo "<p hidden id='carparkCounts'>" . count($rows) . "</p>";
+        $pageCount = ceil(count($rows) / 24);
         $currentPage = 1;
 
-        if ($rowcount > 0) {
+        if (count($rows) > 0) {
 
           echo "<ul class='results-container' id='res-carpark-cont'>";
           $storedResult = array();
           $carparkJsonResult = array();
 
-          for ($i = 0; $i < $rowcount; $i++) {
-              $row = mysqli_fetch_assoc($result);
-              array_push($storedResult, $row);
-              $tempLot = getLots($row, $datamallKey);
+          foreach($rows as $indivCarpark) {
+              array_push($storedResult, $indivCarpark);
+              $tempLot = getLots($indivCarpark, $datamallKey);
               array_push($carparkJsonResult,$tempLot);
           }
         }
@@ -56,7 +56,6 @@ if (isset($_SESSION['FIRSTNAME'])) {
         echo "<span class='inline-text' id='carparksMaxPage'>" . $pageCount . "</span>";
         echo "<a onclick='nextPage()' class='page-arrow'><i class='fa fa-caret-right' aria-hidden='true'></i></a>";
         echo "</div>";
-      }
       ?>
     </div>
   </div>

@@ -1,22 +1,6 @@
 <?php
 
-	// For localhost
-	// $dbServerName = "localhost";
-
-	// For Alicloud
-	$dbServerName = "47.74.176.36";
-
-	$dbUserName = "root";
-
-	// For localhost
-	$dbPassword = "";
-
-	// For Alicloud
-	$dbPassword = "foobar123!";
-
-	$dbName = "foodfinderapp";
+	$mongodbManager = new MongoDB\Driver\Manager('mongodb://47.74.176.60:27017');
 	
 	$googleKey = 'AIzaSyDbEqIHfTZwLD9cgm9-elubEhOCm7_C3VE';
 	$datamallKey = 'SFHPvNC5RP+jFTzftMxxFQ==';
-
-	$conn = mysqli_connect($dbServer, $dbUserName, $dbPassword, $dbName);
