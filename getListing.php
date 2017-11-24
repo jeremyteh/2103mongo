@@ -18,7 +18,7 @@ if (isset($_GET['sort'])) {
   $query = new \MongoDB\Driver\Query($filter,$options);
 }
 //$mongodbManager->timeout(-1);
-set_time_limit(100);
+set_time_limit(0);
 $rows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
 //$rows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
 
