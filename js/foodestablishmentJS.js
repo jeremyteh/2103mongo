@@ -27,9 +27,6 @@ function nextPage() {
   var totalPage = document.getElementById("feTotalPageNo").innerHTML;
   var startCount = currentPage * pageNo;
   var endCount;
-  console.log(currentPage)
-  console.log(totalPage)
-
   if (currentPage < totalPage) {
     currentPage++;
     endCount = currentPage * pageNo;
@@ -50,18 +47,18 @@ function pageJump() {
 function listResult(x, y) {
   document.getElementById("feListing").innerHTML = "<ul class='results-container'  id='feListingTable'>";
   for (var i = x; i < y; i++) {
-    var spaceReplaced = feArray[i][1].split(" ").join("+");
+    var spaceReplaced = (feArray[i].name).split(" ").join("+");
     var symbolReplaced = spaceReplaced.split("&").join("and");
     //document.getElementById("feListingTable").innerHTML += "<div class='res-row-food'>" + feArray[i][0] + "</br>" + feArray[i][1] + "</br>" + feArray[i][2] + "</div>";
     document.getElementById("feListingTable").innerHTML += '<li class="res-row-food">'
-    + '<a class="res-food-img" href="restaurant.php?foodEstablishmentId='+ feArray[i][0] +'">'
-    + '<img src=http://ctjsctjs.com/'+ feArray[i][4] + ">"
+    + '<a class="res-food-img" href="restaurant.php?foodEstablishmentId='+ feArray[i].foodEstablishmentId +'">'
+    + '<img src=http://ctjsctjs.com/'+ feArray[i].image + ">"
     + '</a>'
     + "<div class='res-food'>"
-    + '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='+ feArray[i][0] +'">' + feArray[i][1] + '</a>'
+    + '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='+ feArray[i].foodEstablishmentId +'">' + feArray[i].name + '</a>'
     + '<span class="res-food-subheader">Address</span>'
-    + '<span class="res-add-small">'  + feArray[i][2] + '</span>'
-    + "<a class='res-more' href='restaurant.php?foodEstablishmentId="+ feArray[i][0] +"'>View more <i class='fa fa-caret-right' aria-hidden='true'></i></a>"
+    + '<span class="res-add-small">'  + feArray[i].address + '</span>'
+    + "<a class='res-more' href='restaurant.php?foodEstablishmentId="+ feArray[i].foodEstablishmentId +"'>View more <i class='fa fa-caret-right' aria-hidden='true'></i></a>"
     + '</li>';
   }
   document.getElementById("feListing").innerHTML += "</ul>";

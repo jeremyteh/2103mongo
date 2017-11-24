@@ -4,18 +4,23 @@ include_once 'protected/databaseconnection.php';
 if (isset($_GET['sort'])) {
   $sortValue = $_GET['sort'];
   if ($sortValue == 0) {
-    $filter = array();
-    $options = array("sort" => array("name" => 1));
+    $filter = [];
+    $options = ['sort' => ['name' => 1]];
     $query = new \MongoDB\Driver\Query($filter, $options);
   } elseif ($sortValue == 1) {
-    $filter = array();
-    $options = array("sort" => array("name" => -1));
+    $filter = [];
+    $options = ['sort' => ['name' => -1]];
     $query = new \MongoDB\Driver\Query($filter, $options);
   }
 } else {
-  $query = new \MongoDB\Driver\Query([]);
+  $filter = [];
+  $options = [];
+  $query = new \MongoDB\Driver\Query($filter,$options);
 }
+//$mongodbManager->timeout(-1);
+set_time_limit(100);
 $rows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
+//$rows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
 
 $storedResult = array();
 
@@ -26,7 +31,6 @@ if(!empty($rows)) { ?>
   </div>
   <?php
   foreach ($rows as $indivFoodEstablishment) {
-
     array_push($storedResult, $indivFoodEstablishment);
   }
 } else {
