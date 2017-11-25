@@ -4,13 +4,13 @@
   if (isset($_POST['saveFood']) == 'save'.$carparkID){
     bulk = new MongoDB\Driver\BulkWrite();
 
-    $bulk->insert(['carparkId'=>(string)$_GET['carparkId'], 'userID'=>(string)$_SESSION['ID'], 'status'=>'1']);
+    $bulk->insert(['carparkId'=>(string)$_GET['CarparkId'], 'userID'=>(string)$_SESSION['ID'], 'status'=>'1']);
 
     $result = $mongodbManager->executeBulkWrite('foodfinderapp.favouritecarpark', $bulk);
   }
 
   // Mongo
-  $filter = ['userID'=>(string)$_SESSION['ID'], 'carparkId'=>(string)$_GET['foodestablishmentId']];
+  $filter = ['userID'=>(string)$_SESSION['ID'], 'carparkId'=>(string)$_GET['CarparkId']];
   $query = new \MongoDB\Driver\Query($filter);
   $rows = $mongodbManager->executeQuery('foodfinderapp.favouritecarpark', $query);
   $userRecord = $rows->toArray();
