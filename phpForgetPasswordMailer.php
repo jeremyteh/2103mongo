@@ -31,7 +31,8 @@ $message = 'Dear '.$firstName.',<br><br>
 Your request to reset your password for your account has been received.<br><br>
 
 Please click this link below to reset your account password:<br>
-http://localhost/2103mongo/resetPasswordVerification.php?email='.$_POST["email"].'<br><br>
+
+<a href="http://47.74.176.60/resetPasswordVerification.php?email='.$_POST["email"].'">http://47.74.176.60/resetPasswordVerification.php?email='.$_POST["email"].'</a><br><br>
 
 Regards,<br><br>
 
