@@ -5,7 +5,7 @@
   if (count($carparkNameArray) > 0) {
 
     for($i=0; $i < count($carparkNameArray); $i++) {
-      echo '<a href=carpark.php?carparkId=1" class="res-blocks">';
+      echo '<a href=carpark.php?carparkId='.$carparkIdsArray[$i].' class="res-blocks">';
       for ($x = 0; $x < count($carparkJsonResult->{'value'});$x++){
           if ($carparkJsonResult->{'value'}[$x]->{'CarParkID'} == $carparkIdsArray[$i]){
               echo "<span class='res-lots'>".$carparkJsonResult->{'value'}[$x]->{'Lots'}."</span>";
