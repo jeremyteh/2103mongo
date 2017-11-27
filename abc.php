@@ -7,14 +7,35 @@ $options = [];
 
 /*********************************/
 // for loop print everything
+/*
+$filter = [
+	'$or' => [
+		['area' => new MongoDB\BSON\Regex(".*marina.*","i")],
+		['development' => new MongoDB\BSON\Regex(".*marina.*","i")]
+	]
+];*/
 
-$query = new \MongoDB\Driver\Query([]);
-$rows = $mongodbManager->executeQuery('foodfinderapp.user', $query);
 
+
+$filter = ['name' => new MongoDB\BSON\Regex(".*marina.*","i")];
+
+$query = new MongoDB\Driver\Query($filter);
+$searchFoodEstablishments = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
+
+echo count($searchFoodEstablishments)."<br>";
+
+foreach ($searchFoodEstablishments as $document) {
+    echo $document->name."<br>";
+}
+
+
+//$query = new \MongoDB\Driver\Query([]);
+//$rows = $mongodbManager->executeQuery('foodfinderapp.carpark', $query);
+/*
 foreach ($rows as $dc){
 	echo $dc->email;
 }
-
+*/
 /*********************************/
 
 // check if one thing is in the collection
@@ -56,15 +77,15 @@ $bulk->insert(['firstName'=>'dsds', 'lastName'=>'sdsd', 'email'=>'sds', 'passwor
 $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
 */
 /*********************************/
-
-/*$c = current($rows->toArray());
+/*
+$c = current($rows->toArray());
 
 if($c = null) {
 	echo $c->email;
 }else {
 	echo 'jhdsjdhf';
-}*/
-
+}
+*/
 //echo $c->email;
 
 

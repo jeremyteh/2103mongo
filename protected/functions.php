@@ -44,4 +44,19 @@ function getCarparkLots($locateRow, $key){
   //return (rand(0,10));
 }
 
+//get carpark lot live number
+function getSortCaparkLots($locateRow, $key){
+  $carparkLotsJson = "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailability";
+  $ch = curl_init( $carparkLotsJson );
+  $options = array(
+    CURLOPT_HTTPHEADER => array( "AccountKey: ". $key . ", Accept: application/json" ),
+  );
+  curl_setopt_array( $ch, $options );
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+  $carparkJsonResult = curl_exec( $ch );
+  $carparkJsonResult = json_decode($carparkJsonResult);
+  return ($carparkJsonResult->{'value'}[$locateRow->get_carparkId()]->{'Lots'});
+  //return (rand(0,10));
+}
+
 ?>
