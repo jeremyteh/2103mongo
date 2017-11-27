@@ -44,8 +44,7 @@ function getCarparkLots($locateRow, $key){
   //return (rand(0,10));
 }
 
-//get carpark lot live number
-function getSortCaparkLots($locateRow, $key){
+function getSortCarparkLots($locateRow, $key){
   $carparkLotsJson = "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailability";
   $ch = curl_init( $carparkLotsJson );
   $options = array(
@@ -55,7 +54,13 @@ function getSortCaparkLots($locateRow, $key){
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
   $carparkJsonResult = curl_exec( $ch );
   $carparkJsonResult = json_decode($carparkJsonResult);
-  return ($carparkJsonResult->{'value'}[$locateRow->get_carparkId()]->{'Lots'});
+  for ($i = 0; $i < count($carparkJsonResult->{'value'}); $i ++){
+      if ($carparkJsonResult->{'value'}[$i]->{'CarParkID'} == $locateRow->get_carparkId()){
+          return ($carparkJsonResult->{'value'}[$i]->{'Lots'});
+      } else {
+        continue;
+      }
+  }
   //return (rand(0,10));
 }
 

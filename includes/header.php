@@ -7,6 +7,7 @@ session_start();
 <html>
   <head>
     <title>Foodpark</title>
+    <link rel="shortcut icon" type="image/png" href="images/fav-logo.png"/>
 
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700" rel="stylesheet">

@@ -119,7 +119,7 @@ $datetime = date('Y-m-d H:i:s');
               usort($nearByCarparks, "cmp");
               $oneFoodEstablishmentDisplay['cpStatus'] = true;
               foreach($nearByCarparks as $relatedCarpark) {
-                $lots = getLots($relatedCarpark, $datamallKey); //Get number of lots available
+                $lots = getSortCarparkLots($relatedCarpark, $datamallKey); //Get number of lots available
                 /*EACH BLOCK OF CARPARK*/
                 $oneFoodEstablishmentDisplay['carparkId'] = $relatedCarpark->get_carparkId();
                 $oneFoodEstablishmentDisplay['lots'] = $lots;
