@@ -104,7 +104,7 @@ if (isset($_SESSION['FIRSTNAME'])) {
             usort($nearByCarparks, "cmp");
             $oneFoodEstablishmentDisplay['cpStatus'] = true;
             foreach($nearByCarparks as $relatedCarpark) {
-              $lots = getLots($relatedCarpark, $datamallKey); //Get number of lots available
+              $lots = getSortCarparkLots($relatedCarpark, $datamallKey); //Get number of lots available
               if ($lots >= $input_lots){
                 $validCarparks += 1; //check lots meets input_lots requirement
                 $lotCount += $lots;
