@@ -105,19 +105,19 @@ $datetime = date('Y-m-d H:i:s');
 
 
                 if($distance < 0.5) {
-                    
+
                     $newCarpark = new carparkNearBy();
                     $newCarpark->set_carparkId($carpark->carparkId);
                     $newCarpark->set_carparkName($carpark->development);
                     $newCarpark->set_distance($distance);
 
-                    array_push($nearByCarparks, $newCarpark);           
+                    array_push($nearByCarparks, $newCarpark);
                 }
             }
 
             if(count($nearByCarparks) != 0) {
               usort($nearByCarparks, "cmp");
-              $row['cpStatus'] = true;
+              $oneFoodEstablishmentDisplay['cpStatus'] = true;
               foreach($nearByCarparks as $relatedCarpark) {
                 $lots = getLots($relatedCarpark, $datamallKey); //Get number of lots available
                 /*EACH BLOCK OF CARPARK*/
@@ -132,7 +132,7 @@ $datetime = date('Y-m-d H:i:s');
             else {
               $oneFoodEstablishmentDisplay['cpStatus'] = false;
             }
-            array_push($foodResults,$oneFoodEstablishmentDisplay);   
+            array_push($foodResults,$oneFoodEstablishmentDisplay);
           }
 
           echo "</li>";
@@ -227,7 +227,7 @@ $datetime = date('Y-m-d H:i:s');
         $searchCarparks = $mongodbManager->executeQuery('foodfinderapp.carpark', $query)->toArray();
 
         if(!empty($searchCarparks)) {
-
+            $cpResults = array();
           // output data of each row
             echo "<p hidden id='carparkCount'>" .count($searchCarparks). "</p>";
             $currentCarparkPage = 1;
