@@ -58,14 +58,6 @@ header('Location: 404.php');
 
 			}
 
-<<<<<<< HEAD
-			echo '<ul class="results-container load" id="res-food-cont">';
-
-			$userID = $_SESSION['ID'];
-			$filterFavFood = ['userID' => $userID];
-			$query = new MongoDB\Driver\Query($filterFavFood);
-			$rows = $mongodbManager->executeQuery('foodfinderapp.favouritefood', $query)->toArray();
-=======
 			$userID = $_SESSION['ID'];
 			$filterByIDFood = ['userID' => (string)$userID];
 			$query = new MongoDB\Driver\Query($filterByIDFood);
@@ -80,35 +72,19 @@ header('Location: 404.php');
 				//$filterFood = ['foodEstablishmentId' => $foodID];
 				$foodquery = new MongoDB\Driver\Query(['foodEstablishmentId' => $foodID]);
 				$foodrows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $foodquery);
->>>>>>> 4807fbed259e81433e743fd421d5c6a19cb9bd39
 
-			foreach ($rows as $foodrow){
-				$favFoodID = $foodrow->_id;
-				$foodID = $foodrow->foodestablishmentId;
+				$userRecord = current($foodrows->toArray());
 
-<<<<<<< HEAD
-				$filter = ['foodEstablishmentId' => $foodID];
-				$foodquery = new MongoDB\Driver\Query($filter);
-				$foodrows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $foodquery)->toArray();
-
-				//$userRecord = current($foodrows->toArray());
-
-=======
->>>>>>> 4807fbed259e81433e743fd421d5c6a19cb9bd39
 								echo '<li class="res-row-food">';
 								echo '<a class="res-food-img" href="restaurant.php?foodEstablishmentId='.$foodID.'">';
-								echo '<img src=http://ctjsctjs.com/'.$foodrows->image.'>';
+								echo '<img src=http://ctjsctjs.com/'.$userRecord->image.'>';
 								echo '</a>';
 								echo "<form class='view-delete-form' role='form' method='POST' action='favourites.php'>"
 								. "<input type='hidden' name='deleteFavorite' value='".$favFoodID."'>"
 								. "<button class='delete-fav'><i class='fa fa-times' aria-hidden='true'></i></button>"
 								. "</form>";
 								echo "<div class='res-food'>";
-<<<<<<< HEAD
-								echo '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='.$foodID.'">' .$foodrows->name. '</a>';
-=======
 								echo '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='.$foodID.'">' .$userRecord->name. '</a>';
->>>>>>> 4807fbed259e81433e743fd421d5c6a19cb9bd39
 								echo '</li>';
 								//echo "<span class='res-food-subheader'>Nearest Carpark</span>";
 								#SQL statement to find all carpark within 500m
@@ -123,13 +99,13 @@ header('Location: 404.php');
 				// 			if (mysqli_num_rows($locateResult) > 0) {
 				// 				while($locateRow = mysqli_fetch_assoc($locateResult)) {
 				// 					$lots = getLots($locateRow, $datamallKey); //Get number of lots available
-				// 					/*EACH BLOCK OF CARPARK*/
+				// 					/EACH BLOCK OF CARPARK/
 				// 					echo '<a href=carpark.php?carparkId='.$locateRow["carparkId"].' class="res-blocks">'
 				// 					."<span class='res-lots'>". $lots ."</span>"
 				// 					."<span class='res-name hide-overflow'>" . $locateRow["development"]. "</span>"
 				// 					."<span class='res-dist'>" . sprintf(' %0.2f', $locateRow["distance"])*1000 . "m</span>"
 				// 					."</a>";
-				// 					/*END OF CARPARK BLOCK*/
+				// 					/END OF CARPARK BLOCK/
 				// 				}
 				// 			}
 				// 			else {
@@ -150,27 +126,15 @@ header('Location: 404.php');
 			?>
 
 <?php
-<<<<<<< HEAD
-$filterfavCarpark     = ['userId' => $_SESSION['ID']];
-
-$queryfavCarpark = new MongoDB\Driver\Query($filterfavCarpark);
-$rowsCarpark = $mongodbManager->executeQuery('foodfinderapp.favouritecarpark', $queryfavCarpark);
-echo '<ul id="res-carpark-cont" style="display:none;">';
-
-foreach ($rowsCarpark as $dc){
-	$favCarparkID = $dc->_id;
-	$carparkID = $dc->carparkId;
-	$filterCarpark      = ['carparkId' => (string)$carparkID];
-=======
-$filterByID   = ['userId' => (string)$_SESSION['ID']];
+$filterByID   = ['userID' => (string)$_SESSION['ID']];
 echo '<ul id="res-carpark-cont" style="display:none;">';
 $queryfavCarpark = new MongoDB\Driver\Query($filterByID);
 $rowsCarpark = $mongodbManager->executeQuery('foodfinderapp.favouritecarpark', $queryfavCarpark);
 foreach ($rowsCarpark as $dc){
+
 	$favCarparkID = $dc->_id;
 	$carparkID = $dc->carparkId;
 	$filterCarpark = ['carparkId' => $carparkID];
->>>>>>> 4807fbed259e81433e743fd421d5c6a19cb9bd39
 	$carparkquery = new MongoDB\Driver\Query($filterCarpark);
 	$carparkrows = $mongodbManager->executeQuery('foodfinderapp.carpark', $carparkquery);
 
