@@ -16,7 +16,7 @@ $mail->SMTPAuth = true;
 $mail->Username = "foodparkco@gmail.com"; // SMTP username
 $mail->Password = "foodpark123"; // SMTP password
 $mail->setFrom("foodparkco@gmail.com");  //add sender email address.
-$mail->AddAddress("$email");
+$mail->AddAddress($_POST['email']);
 $mail->WordWrap = 50; // set word wrap
 
 

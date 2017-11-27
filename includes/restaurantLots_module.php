@@ -6,7 +6,13 @@
 
     for($i=0; $i < count($carparkNameArray); $i++) {
       echo '<a href=carpark.php?carparkId=1" class="res-blocks">';
-      echo "<span class='res-lots'>".$carparkJsonResult->{'value'}[$carparkIdsArray[$i]-1]->{'Lots'}."</span>";
+      for ($x = 0; $x < count($carparkJsonResult->{'value'});$x++){
+          if ($carparkJsonResult->{'value'}[$x]->{'CarParkID'} == $carparkIdsArray[$i]){
+              echo "<span class='res-lots'>".$carparkJsonResult->{'value'}[$x]->{'Lots'}."</span>";
+          } else {
+              continue;
+          }
+      }
       echo '<div class="res-name" >' .$carparkNameArray[$i]. '</div>';
       echo '<div class="res-dist" >' .$carparkDistanceArray[$i]. 'm</div>';
       echo "</a>";

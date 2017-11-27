@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(E_ALL);
 require("PHPMailer_5.2.4/class.phpmailer.php");
 
@@ -16,12 +17,13 @@ $mail->SMTPAuth = true;
 $mail->Username = "foodparkco@gmail.com"; // SMTP username
 $mail->Password = "foodpark123"; // SMTP password
 $mail->setFrom("foodparkco@gmail.com");  //add sender email address.
-$mail->AddAddress("$email");
+$mail->AddAddress($_POST['email']);
 $mail->WordWrap = 50; // set word wrap
 
 
 $mail->IsHTML(true); // set email format to HTML
 $mail->Subject = 'Foodpark Reset Password Notification';
+
 
         
 $message = 'Dear '.$firstName.',<br><br>

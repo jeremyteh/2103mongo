@@ -18,6 +18,13 @@ if(isset($_GET['foodEstablishmentId'])) {
     return ($nearByCarparks->distance < $b->distance) ? -1 : 1;
   }
 
+  // create arrays to store carpark name and distance
+  $carparkIdsArray = [];
+  $carparkNameArray = [];
+  $carparkLatArray = [];
+  $carparkLongArray = [];
+  $carparkDistanceArray = [];
+
   // Editted SQL statement (Nizam)
 
   $filter = ['foodEstablishmentId'=>$_GET['foodEstablishmentId']];
@@ -82,13 +89,6 @@ if(isset($_GET['foodEstablishmentId'])) {
 
   if(count($nearByCarparks) != 0) {
     usort($nearByCarparks, "cmp");
-
-    // create arrays to store carpark name and distance
-    $carparkIdsArray = [];
-    $carparkNameArray = [];
-    $carparkLatArray = [];
-    $carparkLongArray = [];
-    $carparkDistanceArray = [];
 
     foreach($nearByCarparks as $relatedCarpark) {
       array_push($carparkIdsArray, $relatedCarpark->get_carparkId());
