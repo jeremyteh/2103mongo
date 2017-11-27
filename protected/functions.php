@@ -3,9 +3,14 @@
 function getLocation($postalCode, $googleKey){
   $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=.' . $postalCode . '&key='. $googleKey);
   $json = json_decode($json);
+  if (isset($json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'}) && isset($json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'})){
+      $lat = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+      $long = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+  } else {
+      $lat = 0;
+      $long = 0;
+  }
 
-  $lat = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-  $long = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
 
   return array($lat, $long);
 }

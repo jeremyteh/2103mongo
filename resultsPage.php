@@ -62,7 +62,7 @@ $datetime = date('Y-m-d H:i:s');
           $currentFoodPage = 1;
           $maxFoodPage = ceil(count($searchFoodEstablishments) / 24);
 
-          
+
 
           echo '<ul class="load" id="res-food-cont">';
           foreach ($searchFoodEstablishments as $indivFoodEstablishment) {
@@ -163,7 +163,7 @@ $datetime = date('Y-m-d H:i:s');
           // output data of each row
             echo "<p hidden id='carparkCount'>" .count($searchCarparks). "</p>";
             $currentCarparkPage = 1;
-            $maxCarparkPage = ceil(count($searchCarparks) / 3);
+            $maxCarparkPage = ceil(count($searchCarparks) / 24);
 
             $bulk = new MongoDB\Driver\BulkWrite();
 
@@ -186,7 +186,7 @@ $datetime = date('Y-m-d H:i:s');
               $oneCarparkDisplay['development'] = $indivCarpark->development;
               $oneCarparkDisplay['image'] = $indivCarpark->image;
 
-              $lots = getLots($indivCarpark, $datamallKey); //Get number of lots available
+              $lots = getCarparkLots($indivCarpark, $datamallKey); //Get number of lots available
               $oneCarparkDisplay['lots'] = $lots;
               array_push($cpResults,$oneCarparkDisplay);
             }

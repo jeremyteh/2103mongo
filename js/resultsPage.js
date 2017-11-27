@@ -106,10 +106,10 @@ function listFoodResult(x,y){
 
 function initialCarparkLoad(){
     var carparkCount = document.getElementById("carparkCount").innerHTML;
-    if (carparkCount > 0 && carparkCount < 3){
+    if (carparkCount > 0 && carparkCount < 24){
         var endLength = carparkCount;
-    } else if (carparkCount >= 3){
-        var endLength = 3;
+    } else if (carparkCount >= 24){
+        var endLength = 24;
     }
     for (var i = 0; i < endLength; i++){
       document.getElementById("res-carpark-cont").innerHTML += "<li class='res-row-food'>"
@@ -154,8 +154,8 @@ function prevCarparkPage(){
 }
 
 function listCarparkResult(x,y){
-    var startIndex = x * 3;
-    var endIndex = y * 3;
+    var startIndex = x * 24;
+    var endIndex = y * 24;
     var totalFood = document.getElementById("carparkCount").innerHTML;
     if (endIndex > totalFood){
         endIndex = totalFood;
