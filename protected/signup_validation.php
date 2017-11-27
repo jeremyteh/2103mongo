@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		// Just some random code for website admin
 		if($_POST['refCode'] == 2103) {
-			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'role'=>'website admin', 'type'=>'AD']);
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>false, 'role'=>'website admin', 'type'=>'AD']);
 			try {
 			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
 			    include_once("../phpAdminAccountActivationMailer.php");
@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
 		// Just some random code for food blogger
 		else if($_POST['refCode'] == 3012) {
-			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'role'=>'food blogger', 'type'=>'AD']);
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>false, 'role'=>'food blogger', 'type'=>'AD']);
 			try {
 			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
 			    include_once("../phpAdminAccountActivationMailer.php");
@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			}			
 		}
 		else {
-			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>'false', 'type'=>'NAD']);
+			$bulk->insert(['firstName'=>$_POST['firstName'], 'lastName'=>$_POST['lastName'], 'email'=>$_POST['email'], 'password'=>$hashedPassword, 'hash'=>$hash, 'accountActivated'=>false, 'type'=>'NAD']);
 			try {
 			    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
 			    include_once("../phpNonAdminAccountActivationMailer.php");

@@ -1,5 +1,7 @@
 <?php include_once 'includes/header.php' ?>
 <?php include_once 'protected/databaseconnection.php' ?>
+<?php include_once 'nearbyCarparkForIndivFood.php' ?>
+
 <?php
 if (isset($_SESSION['FIRSTNAME'])) {
   include_once 'includes/nav_user.php';
@@ -7,53 +9,95 @@ if (isset($_SESSION['FIRSTNAME'])) {
   include_once 'includes/nav_index.php';
 }
 if(isset($_GET['foodEstablishmentId'])) {
-  ?>
-  <?php
+
+  function cmp($nearByCarparks, $b)
+  {
+    if ($nearByCarparks->distance == $b->distance) {
+      return 0;
+    }
+    return ($nearByCarparks->distance < $b->distance) ? -1 : 1;
+  }
 
   // Editted SQL statement (Nizam)
-  $foodID = $_GET['foodEstablishmentId'];
-  $selectedFoodEstablishment = "SELECT name, address,image, RIGHT(address, 6) as postalcode,CAST(AVG(review.AvgRating) as decimal(18,1)), COUNT(review.AvgRating) FROM foodestablishment INNER JOIN review ON foodestablishment.foodestablishmentId = review.foodEstablishmentId WHERE foodestablishment.foodEstablishmentId = '".$_GET['foodEstablishmentId']."'";
-  $result = mysqli_query($conn, $selectedFoodEstablishment) or die(mysqli_connect_error());
-  $row = mysqli_fetch_array($result);
-  $rating = $row[3];
-  $numofreview = $row[5];
 
-  $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=.' . $row['postalcode']. '&key=AIzaSyDbEqIHfTZwLD9cgm9-elubEhOCm7_C3VE');
+  $filter = ['foodEstablishmentId'=>$_GET['foodEstablishmentId']];
+
+  $query = new MongoDB\Driver\Query($filter);
+  $selectedFoodEstablishment = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $query)->toArray();
+
+  $query = new MongoDB\Driver\Query($filter);
+  $allReviews = $mongodbManager->executeQuery('foodfinderapp.review', $query)->toArray();
+
+  $TotalAvgRating = 0;
+
+  foreach($allReviews as $indivReview) {
+    $TotalAvgRating += $indivReview->AvgRating;
+  }
+
+  if($TotalAvgRating != 0) {
+    $rating = $TotalAvgRating/count($allReviews);
+  }
+  else{
+    $rating = 0;
+  } 
+
+  $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=.'.substr($selectedFoodEstablishment[0]->address, -6).'&key=AIzaSyDbEqIHfTZwLD9cgm9-elubEhOCm7_C3VE');
   $json = json_decode($json);
 
   $lat = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
   $long = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
 
-  #SQL statement to find all carpark within 500m
-  $locateSQL = "SELECT *, ( 6371 *
-    acos(
-      cos( radians(". $lat .")) * cos( radians( latitude )) *
-      cos( radians( longitude ) - radians(". $long .")) +
-      sin(radians(". $lat .")) * sin(radians(latitude))
-      ))
-      as distance FROM carpark HAVING distance < 0.5 ORDER BY distance";
+  set_time_limit(0);
+  $query = new MongoDB\Driver\Query([]);
+  $allCarparks = $mongodbManager->executeQuery('foodfinderapp.carpark', $query)->toArray();
 
-      $locateResult = mysqli_query($conn, $locateSQL) or die(mysqli_connect_error());
+  $nearByCarparks = array();
+  foreach ($allCarparks as $carpark) {
 
-      // create arrays to store carpark name and distance
-      $carparkIdsArray = [];
-      $carparkNameArray = [];
-      $carparkLatArray = [];
-      $carparkLongArray = [];
-      $carparkDistanceArray = [];
+    //RAD
+    $foodestablishmentLat = ($lat/180)*M_PI;
+    $carparkLat = (($carpark->latitude)/180)*M_PI;
+    $foodestablishmentlong = ($long/180)*M_PI;
+    $carparkLong = (($carpark->longitude)/180)*M_PI;
 
-      if ($locateResult) {
-        if (mysqli_num_rows($locateResult) > 0) {
-          while($locateRow = mysqli_fetch_assoc($locateResult)) {
-            array_push($carparkIdsArray, $locateRow["carparkId"]);
-            array_push($carparkNameArray, $locateRow["development"]);
-            array_push($carparkLatArray, $locateRow["latitude"]);
-            array_push($carparkLongArray, $locateRow["longitude"]);
-            array_push($carparkDistanceArray, sprintf('%0.2f', $locateRow["distance"])*1000);
+    //equatorial radius
+    $r = 6378.137;
+    // Formula
+    $e = acos( sin($foodestablishmentLat)*sin($carparkLat) + cos($foodestablishmentLat)*cos($carparkLat)*cos($carparkLong-$foodestablishmentlong) );
+    $distance = round($r*$e, 4);
 
-          }
-        }
-      }
+
+    if($distance < 0.5) {
+
+      $newCarpark = new carparkNearBy();
+      $newCarpark->set_carparkId($carpark->carparkId);
+      $newCarpark->set_carparkName($carpark->development);
+      $newCarpark->set_latitude($carpark->latitude);
+      $newCarpark->set_longitude($carpark->longitude);
+      $newCarpark->set_distance($distance);
+
+      array_push($nearByCarparks, $newCarpark);
+    }
+  }
+
+  if(count($nearByCarparks) != 0) {
+    usort($nearByCarparks, "cmp");
+
+    // create arrays to store carpark name and distance
+    $carparkIdsArray = [];
+    $carparkNameArray = [];
+    $carparkLatArray = [];
+    $carparkLongArray = [];
+    $carparkDistanceArray = [];
+
+    foreach($nearByCarparks as $relatedCarpark) {
+      array_push($carparkIdsArray, $relatedCarpark->get_carparkId());
+      array_push($carparkNameArray, $relatedCarpark->get_carparkname());
+      array_push($carparkLatArray, $relatedCarpark->get_latitude());
+      array_push($carparkLongArray, $relatedCarpark->get_longitude());
+      array_push($carparkDistanceArray, sprintf('%0.2f', $relatedCarpark->get_distance())*1000);
+    }
+  }
       $carparkLotsJson = "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailability";
 
       $ch      = curl_init( $carparkLotsJson );

@@ -4,13 +4,13 @@
 
     $bulk = new MongoDB\Driver\BulkWrite();
 
-    $bulk->insert(['foodestablishmentId'=>(string)$_GET['foodEstablishmentId'], 'userID'=>(string)$_SESSION['ID'], 'status'=>'1']);
+    $bulk->insert(['foodestablishmentId'=>$_GET['foodEstablishmentId'], 'userID'=>(string)$_SESSION['ID'], 'status'=>'1']);
 
     $result = $mongodbManager->executeBulkWrite('foodfinderapp.favouritefood', $bulk);
 
 }
 
-  $filter = ['userID'=>(string)$_SESSION['ID'], 'foodestablishmentId'=>(string)$_GET['foodEstablishmentId']];
+  $filter = ['userID'=>(string)$_SESSION['ID'], 'foodestablishmentId'=>$_GET['foodEstablishmentId']];
   $query = new \MongoDB\Driver\Query($filter);
   $rows = $mongodbManager->executeQuery('foodfinderapp.favouritefood', $query);
   $userRecord = $rows->toArray();

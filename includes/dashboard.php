@@ -10,8 +10,53 @@
     </form>
   </div>
 </section>
-
+    
     <?php
+
+    $query = new MongoDB\Driver\Query([]);
+    $allSearches = $mongodbManager->executeQuery('foodfinderapp.foodsearch', $query)->toArray();
+
+    $tempArray = array();
+    $tempCount = 0;
+
+    if(count($allSearches) > 0) {
+
+      echo '<section class="container-recentSearch">'
+      .'<div class=" container-responsive">';
+      echo "<span class='recent-search'>Recent searches: </span>";
+      for ($i = 0; $i < count($allSearches); $i++){
+        if ($tempCount == 3){
+          break;
+        }
+        if (empty($tempArray)){
+          array_push($tempArray,$allSearches[$i]);
+          $tempCount++; 
+        } else {
+          $tempFlag = 0;
+          for ($x = 0; $x < count($tempArray); $x++){
+            if ($allSearches[$i]->termSearch == $tempArray[$x]->termSearch){
+              $tempFlag = 1;
+              break;
+            } else {
+              continue;
+            }
+          }
+          if ($tempFlag == 0){
+            array_push($tempArray,$allSearches[$i]);
+            $tempCount++;
+          }
+        }      
+      }
+    }
+
+    foreach ($tempArray as $indivSearch){
+      
+      echo "<form class='recent-form' action='resultsPage.php' method='POST'><input type='hidden' name='search' class='form-control' value='".$indivSearch->termSearch."'><button class='recentSearchesButton' type='submit'>".$indivSearch->termSearch."</button></form>";
+    }
+
+    echo '</div></section>';
+    /*
+    $getTermSearches = $database->foodsearch->find(array('userId' => $_SESSION['ID']))->sort(array('dateTimeSearch'=>-1));
     $getTermSearches = "SELECT termSearch FROM foodsearch WHERE userId = ".$_SESSION['ID']." ORDER BY dateTimeSearch DESC";
     $result = mysqli_query($conn,  $getTermSearches) or die(mysqli_connect_error());
 
@@ -34,5 +79,5 @@
         }
       }
       echo '</div></section>';
-    }
+    }*/
     ?>

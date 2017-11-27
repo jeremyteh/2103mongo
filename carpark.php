@@ -1,5 +1,6 @@
 <?php include_once 'includes/header.php' ?>
 <?php include_once 'protected/databaseconnection.php' ?>
+<?php include_once 'protected/functions.php' ?>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLgOEetVt0oeA8HdyUmOAdW8O1e0qpB7Q"></script>
 <?php
 if(isset($_SESSION['FIRSTNAME']))
@@ -9,19 +10,39 @@ include_once 'includes/nav_index.php';
 
 if(isset($_GET['carparkId'])) {
 	$carparkID = $_GET['carparkId'];
-	$selectedCarpark = "SELECT latitude,longitude,development,CAST(AVG(feedback.AvgRating) as decimal(18,1)), COUNT(feedback.AvgRating), image FROM carpark INNER JOIN feedback ON carpark.carparkId = feedback.carparkId WHERE carpark.carparkId = '".$_GET['carparkId']."'";
-	$result = mysqli_query($conn, $selectedCarpark) or die(mysqli_connect_error());
-	$row = mysqli_fetch_array($result);
-	$rating = $row[3];
-	$numofreview = $row[4];
-	$latitude = $row[0];
-	$longtitude = $row[1];
+
+	$filter = ['carparkId'=>$_GET['carparkId']];
+
+	$query = new MongoDB\Driver\Query($filter);
+	$selectedCarpark = $mongodbManager->executeQuery('foodfinderapp.carpark', $query)->toArray();
+
+	$filter = ['carparkId'=>$_GET['carparkId']];
+
+	$query = new MongoDB\Driver\Query($filter);
+	$allFeedbacks = $mongodbManager->executeQuery('foodfinderapp.feedback', $query)->toArray();
+
+	$TotalAvgRating = 0;
+
+	foreach($allFeedbacks as $indivFeedback) {
+		$TotalAvgRating += $indivFeedback->AvgRating;
+	}
+
+	if($TotalAvgRating != 0) {
+    	$rating = $TotalAvgRating/count($allFeedbacks);
+	}
+	else{
+		$rating = 0;
+	} 
+
+	$numofreview = count($allFeedbacks);
+	$latitude = $selectedCarpark[0]->latitude;
+	$longtitude = $selectedCarpark[0]->longitude;
 }
 
-$json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?&latlng='.$row["latitude"].','.$row["longitude"].'&key='. $googleKey);
+$json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?&latlng='.$latitude.','.$longtitude.'&key='. $googleKey);
 $json1 = json_decode($json);
+/*
 
-/*GET LOTS*/
 $carparkLotsJson = "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailability";
 $ch = curl_init($carparkLotsJson );
 $options = array(CURLOPT_HTTPHEADER=>array("AccountKey: SFHPvNC5RP+jFTzftMxxFQ==, Accept: application/json" ),);
@@ -30,6 +51,9 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 $carparkJsonResult = curl_exec( $ch );
 $carparkJsonResult = json_decode($carparkJsonResult);
 $lots = $carparkJsonResult->{'value'}[$carparkID-1]->{'Lots'};
+*/
+$lots = getLots($selectedCarpark[0], $datamallKey);
+
 ?>
 
 <section class="container-searchbar">
@@ -51,9 +75,9 @@ $lots = $carparkJsonResult->{'value'}[$carparkID-1]->{'Lots'};
 			<div class="res-left-mod">
 				<div class="res-wrapper">
 					<div class="res-wrapper-header">
-						<h><?php echo $row["development"]; ?></h>
+						<h><?php echo $selectedCarpark[0]->development ?></h>
 					</div>
-					<div class="carpark-img" style="background-image: url(http://ctjsctjs.com/<?php echo $row['image'] ?>)"></div>
+					<div class="carpark-img" style="background-image: url(http://ctjsctjs.com/<?php echo $selectedCarpark[0]->image ?>)"></div>
 				</div>
 				<div class="res-body">
 					<span class="res-add"><?php echo $json1->{'results'}[0]->{'formatted_address'}; ?></span>
@@ -62,13 +86,42 @@ $lots = $carparkJsonResult->{'value'}[$carparkID-1]->{'Lots'};
 							<div id="tutorial-<?php echo $_GET['carparkId']; ?>">
 								<?php $property=array("Accessiblity","Cleaniness","Parking Rate","Space","User Friendly"); ?>
 								<?php
-								$reviewquery = "SELECT ROUND(AVG(accessibility)) AS accessibility, ROUND(AVG(clean)) AS clean,ROUND(AVG(parkRate)) AS parkRate,ROUND(AVG(space)) AS space,ROUND(AVG(userFriendly)) AS userFriendly FROM feedback WHERE carparkId = '".$_GET['carparkId']."'";
-								$listreview = mysqli_query($conn, $reviewquery);
 
-								if ($listreview) {
+									$filter = ['carparkId'=>$_GET['carparkId']];
 
-									while ($row = mysqli_fetch_row($listreview)) {
-										$count = 0;
+									$query = new MongoDB\Driver\Query($filter);
+									$allFeedbacks = $mongodbManager->executeQuery('foodfinderapp.feedback', $query)->toArray();
+									
+									$TotalAccessRating = 0;
+							        $TotalCleanRating = 0;
+							        $TotalParkRating = 0;
+							        $TotalSpaceRating = 0;
+							        $TotalUserFriendlyRating = 0;
+
+							        foreach($allFeedbacks as $indivFeedback) {
+							          $TotalAccessRating += $indivFeedback->accessibility;
+							          $TotalCleanRating += $indivFeedback->clean;
+							          $TotalParkRating += $indivFeedback->parkRate;
+							          $TotalSpaceRating += $indivFeedback->space;
+							          $TotalUserFriendlyRating += $indivFeedback->userFriendly;
+							        }
+
+							        $allRatings = array();
+
+							        if(($TotalAccessRating != 0) or ($TotalCleanRating != 0) or ($TotalParkRating != 0) or ($TotalSpaceRating = 0) or($TotalUserFriendlyRating = 0)) {
+
+							            $AvgAccessRating = round($TotalAccessRating/count($allFeedbacks), 2);
+							            array_push($allRatings, $AvgAccessRating);
+							            $AvgCleanRating = round($TotalCleanRating/count($allFeedbacks), 2);
+							            array_push($allRatings, $AvgCleanRating);
+							            $AvgParkRating = round($TotalParkRating/count($allFeedbacks), 2);
+							            array_push($allRatings, $AvgParkRating);
+							            $AvgSpaceRating = round($TotalSpaceRating/count($allFeedbacks), 2);
+							            array_push($allRatings, $AvgSpaceRating);
+							            $AvgUserFriendlyRating = round($TotalUserFriendlyRating/count($allFeedbacks), 2);
+							            array_push($allRatings, $AvgUserFriendlyRating);
+							        }
+
 
 										for($p = 0; $p < 5;$p++ ){
 											echo '<tr><td>'.$property[$p].'</td>';
@@ -77,7 +130,7 @@ $lots = $carparkJsonResult->{'value'}[$carparkID-1]->{'Lots'};
 
 											for($i=1;$i<=5;$i++) {
 												$selected = "";
-												if(!empty($row[$p]) && $i<=$row[$p]) {
+												if(!empty($allRatings[$p]) && $i<=$allRatings[$p]) {
 													$selected = "selected";
 												}
 												echo '<li class="'.$selected.'">&#9733;</li>';
@@ -85,8 +138,8 @@ $lots = $carparkJsonResult->{'value'}[$carparkID-1]->{'Lots'};
 											echo '</ul>';
 											echo '</td></tr>';
 										}
-									}
-								}
+									
+								
 								?>
 							</div>
 						</tbody>
