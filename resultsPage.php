@@ -82,7 +82,6 @@ $datetime = date('Y-m-d H:i:s');
             $oneFoodEstablishmentDisplay['image'] = $indivFoodEstablishment->image;
 
             /*EACH FOOD INSTANCE*/
-            #SQL statement to find all carpark within 500m
             $locationVector = getLocation(substr($indivFoodEstablishment->address, -6), $googleKey);
 
             set_time_limit(0);

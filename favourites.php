@@ -1,5 +1,6 @@
 <?php include_once 'includes/header.php' ?>
 <?php include_once 'protected/databaseconnection.php' ?>
+<?php include_once 'nearbyCarpark.php' ?>
 
 <?php
 if(isset($_SESSION['FIRSTNAME']))
@@ -33,6 +34,14 @@ header('Location: 404.php');
 			include_once 'protected/databaseconnection.php';
 			include_once 'protected/functions.php';
 
+			function cmp($nearByCarparks, $b)
+	        {
+	            if ($nearByCarparks->distance == $b->distance) {
+	                return 0;
+	            }
+	            return ($nearByCarparks->distance < $b->distance) ? -1 : 1;
+	        }
+
 			if ($_SERVER["REQUEST_METHOD"] == "POST"){
 				if (isset($_POST['deleteFavorite']))
 				{
@@ -64,65 +73,94 @@ header('Location: 404.php');
 			$rows = $mongodbManager->executeQuery('foodfinderapp.favouritefood', $query);
 
 			echo '<ul class="results-container load" id="res-food-cont">';
-
+			if(count($rows) >0){
 			foreach ($rows as $what){
 				$favFoodID = $what->_id;
 				$foodID = $what->foodestablishmentId;
 
 				//$filterFood = ['foodEstablishmentId' => $foodID];
 				$foodquery = new MongoDB\Driver\Query(['foodEstablishmentId' => $foodID]);
-				$foodrows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $foodquery);
+				$foodrows = $mongodbManager->executeQuery('foodfinderapp.foodestablishment', $foodquery)->toArray();
 
-				$userRecord = current($foodrows->toArray());
+				$userRecord = current($foodrows);
 
-								echo '<li class="res-row-food">';
-								echo '<a class="res-food-img" href="restaurant.php?foodEstablishmentId='.$foodID.'">';
-								echo '<img src=http://ctjsctjs.com/'.$userRecord->image.'>';
-								echo '</a>';
-								echo "<form class='view-delete-form' role='form' method='POST' action='favourites.php'>"
-								. "<input type='hidden' name='deleteFavorite' value='".$favFoodID."'>"
-								. "<button class='delete-fav'><i class='fa fa-times' aria-hidden='true'></i></button>"
-								. "</form>";
-								echo "<div class='res-food'>";
-								echo '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='.$foodID.'">' .$userRecord->name. '</a>';
-								echo '</li>';
-								//echo "<span class='res-food-subheader'>Nearest Carpark</span>";
-								#SQL statement to find all carpark within 500m
-								// NEED TO ADD CARPARK
-								//row[5] is address
-				// 		$postalcode = substr($row[5], -6);
-				// 		$locationVector = getLocation($postalcode, $googleKey); //Get Coords
-				// 		$dist = "( 6371 * acos( cos( radians(". $locationVector[0] .")) * cos( radians( latitude )) * cos( radians( longitude ) - radians(". $locationVector[1] .")) + sin(radians(". $locationVector[0] .")) * sin(radians(latitude))))";
-				// 		$locateSQL = "SELECT *, ".$dist." as distance FROM carpark HAVING distance < 0.5 ORDER BY distance ASC LIMIT 1 ";
-				// 		$locateResult = mysqli_query($conn, $locateSQL) or die(mysqli_connect_error());
-				// 		if ($locateResult) {
-				// 			if (mysqli_num_rows($locateResult) > 0) {
-				// 				while($locateRow = mysqli_fetch_assoc($locateResult)) {
-				// 					$lots = getLots($locateRow, $datamallKey); //Get number of lots available
-				// 					/EACH BLOCK OF CARPARK/
-				// 					echo '<a href=carpark.php?carparkId='.$locateRow["carparkId"].' class="res-blocks">'
-				// 					."<span class='res-lots'>". $lots ."</span>"
-				// 					."<span class='res-name hide-overflow'>" . $locateRow["development"]. "</span>"
-				// 					."<span class='res-dist'>" . sprintf(' %0.2f', $locateRow["distance"])*1000 . "m</span>"
-				// 					."</a>";
-				// 					/END OF CARPARK BLOCK/
-				// 				}
-				// 			}
-				// 			else {
-				// 				echo "<span class='res-empty'><i class='fa fa-exclamation-circle' aria-hidden='true'></i> No Carparks Nearby</span>";
-				// 			}
-				// 		}
-				// 		echo "<a class='res-more' href='restaurant.php?foodEstablishmentId=".$row[4]."'>View more <i class='fa fa-caret-right' aria-hidden='true'></i></a></div>";
-				// 		echo "</li>";
-				// 	}
-				// }
-				// else {
-				// 	echo "<span class='empty-result' id='label-food'><i class='fa fa-exclamation-circle' aria-hidden='true'></i> No Favourites are found. Start browsing today.</span>";
-				// }
+				echo '<li class="res-row-food">';
+				echo '<a class="res-food-img" href="restaurant.php?foodEstablishmentId='.$foodID.'">';
+				echo '<img src=http://ctjsctjs.com/'.$userRecord->image.'>';
+				echo '</a>';
+				echo "<form class='view-delete-form' role='form' method='POST' action='favourites.php'>"
+				. "<input type='hidden' name='deleteFavorite' value='".$favFoodID."'>"
+				. "<button class='delete-fav'><i class='fa fa-times' aria-hidden='true'></i></button>"
+				. "</form>";
+				echo "<div class='res-food'>";
+				echo '<a class="results-header hide-overflow" href="restaurant.php?foodEstablishmentId='.$foodID.'">' .$userRecord->name. '</a>';
+
+				$locationVector = getLocation(substr($foodrows[0]->address, -6), $googleKey);
+
+				set_time_limit(0);
+				$query = new MongoDB\Driver\Query([]);
+				$allCarparks = $mongodbManager->executeQuery('foodfinderapp.carpark', $query)->toArray();
+
+				$nearByCarparks = array();
+				foreach ($allCarparks as $carpark) {
+
+					                //RAD
+					$foodestablishmentLat = ($locationVector[0]/180)*M_PI;
+					$carparkLat = (($carpark->latitude)/180)*M_PI;
+					$foodestablishmentlong = ($locationVector[1]/180)*M_PI;
+					$carparkLong = (($carpark->longitude)/180)*M_PI;
+
+					                //equatorial radius
+					$r = 6378.137;
+					                // Formel
+					$e = acos( sin($foodestablishmentLat)*sin($carparkLat) + cos($foodestablishmentLat)*cos($carparkLat)*cos($carparkLong-$foodestablishmentlong) );
+					$distance = round($r*$e, 4);
 
 
-			}
+					if($distance < 0.5) {
+
+						$newCarpark = new carparkNearBy();
+						$newCarpark->set_carparkId($carpark->carparkId);
+						$newCarpark->set_carparkName($carpark->development);
+						$newCarpark->set_distance($distance);
+
+						array_push($nearByCarparks, $newCarpark);
+					}
+				}
+
+				if(count($nearByCarparks) != 0) {
+					usort($nearByCarparks, "cmp");
+					foreach($nearByCarparks as $relatedCarpark) {
+						                $lots = getSortCarparkLots($relatedCarpark, $datamallKey); //Get number of lots available
+						                /*EACH BLOCK OF CARPARK*/
+
+						                echo '<a href=carpark.php?carparkId='.$relatedCarpark->get_carparkId().' class="res-blocks">'
+						                ."<span class='res-lots'>". $lots ."</span>"
+						                ."<span class='res-name hide-overflow'>" . $relatedCarpark->get_carparkName(). "</span>"
+						                ."<span class='res-dist'>" . sprintf(' %0.2f', $relatedCarpark->get_distance())*1000 . "m</span>"
+						                ."</a>";
+						                /*END OF CARPARK BLOCK*/
+						                break;
+						            }
+						        }
+						        else {
+						        	echo "<span class='res-empty'><i class='fa fa-exclamation-circle' aria-hidden='true'></i> No Carparks Nearby</span>";
+						        }
+						        echo "<a class='res-more' href='restaurant.php?foodEstablishmentId=".$foodID."'>View more <i class='fa fa-caret-right' aria-hidden='true'></i></a></div>";
+
+						        echo "</li>";
+						    }
+						}
+								
+				else {
+					echo "<span class='empty-result' id='label-food'><i class='fa fa-exclamation-circle' aria-hidden='true'></i> No Favourites are found. Start browsing today.</span>";
+				}
+
+
+			
 			echo '</ul>';
+
+
 			?>
 
 <?php
@@ -146,8 +184,8 @@ foreach ($rowsCarpark as $dc){
          .'<img src=http://ctjsctjs.com/'.$carparkRecord->image.'>'
          .'</a>'
 		 			."<form class='view-delete-form' role='form' method='POST' action='favourites.php'>"
-		 			. "<input type='hidden' name='deleteCarpark' value='".$favCarparkID."'>"
-		 			. "<button class='delete-carpark'><i class='fa fa-times' aria-hidden='true'></i></button>"
+				. "<input type='hidden' name='deleteCarpark' value='".$favCarparkID."'>"
+				. "<button class='delete-fav'><i class='fa fa-times' aria-hidden='true'></i></button>"
 		 			. "</form>"
            ."<div class='res-food'>"
            .'<a class="results-header hide-overflow" href=carpark.php?carparkId='.$carparkID.'>' .$carparkRecord->development. '</a>'
