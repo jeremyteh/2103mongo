@@ -22,21 +22,26 @@
 			<?php
 			error_reporting(E_ERROR | E_PARSE);
 			if (isset($_GET['email']) && !empty($_GET['email']) AND isset($_GET['hash']) && !empty($_GET['hash'])) {
-				// Verify data
-				$email = $_GET['email']; // Set email variable
-				$hash = $_GET['hash']; // Set hash variable
 
-				$search = "SELECT * FROM user WHERE email= '$email' AND hash= '$hash' AND accountActivated='0'";
-				$result = mysqli_query($conn, $search) or die(mysqli_connect_error());
-				$match = mysqli_num_rows($result);
+				$filter = ['email'=>$_GET['email'], 'hash'=>$_GET['hash'], 'accountActivated'=>false];
 
-				if ($match == 1) {
-					// We have a match, activate the account
-					$updateAccount = "UPDATE user SET accountActivated = 1 WHERE email='$email' AND hash='$hash' AND accountActivated='0'";
-					mysqli_query($conn, $updateAccount) or die(mysqli_connect_error());
+			    $query = new \MongoDB\Driver\Query($filter);
+			    $rows = $mongodbManager->executeQuery('foodfinderapp.user', $query)->toArray();
+			    
+			    if(current($rows)) {
+			    	
+			    	$bulk = new MongoDB\Driver\BulkWrite();
+
+			    	$bulk->update(['_id' => $rows[0]->_id], ['$set' => ['accountActivated'=>true]], ['multi' => false, 'upsert' => false]);
+
+			    	try {
+					    $result = $mongodbManager->executeBulkWrite('foodfinderapp.user', $bulk);
+					} catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+					    $result = var_dump($e->getWriteResult());
+					}
 					echo "<h1 align='center'>Your account has been activated! Happy parking and eating!</h1>";
-					echo '<div class="error-return">Click <a class="inline-text" href="index.php">here</a> to return home.</div>';
-				}
+					echo '<div class="error-return">Click <a class="inline-text" href="index.php">here</a> to return home.</div>';	
+			    }			
 				else {
 					// No match -> invalid url or account has already been activated.
 					//header("Location:../404.php");

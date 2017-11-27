@@ -2,8 +2,96 @@
 
 include_once 'protected/databaseconnection.php';
 
+
+$options = ['sort' => ['dateTimeSearch' => -1]];
+
+
+$query = new MongoDB\Driver\Query([], $options);
+$allSearches = $mongodbManager->executeQuery('foodfinderapp.foodsearch', $query)->toArray();
+$count = 0;
+$recentSearches = "";
+$recent3Searches = array();
+/*
+for ($i = 0; $i < count($allSearches); $i++){
+	if (($i + 1) < count($allSearches)){
+		if ($allSearches[$i]->termSearch == $allSearches[$i+1]->termSearch){
+			continue;
+		} else {
+			echo $allSearches[$i]->termSearch;
+			echo $allSearches[$i]->dateTimeSearch;
+		}
+	} else {
+		echo $allSearches[$i]->termSearch;
+		echo $allSearches[$i]->dateTimeSearch;
+	}
+}
+*/
+if (isset($tempArray)){
+	unset($tempArray);
+}
+if (isset($tempCount)){
+	$tempCount = 0;
+}
+$tempArray = array();
+$tempCount = 0;
+for ($i = 0; $i < count($allSearches); $i++){
+	if ($tempCount == 3){
+		break;
+	}
+	if (empty($tempArray)){
+		array_push($tempArray,$allSearches[$i]);
+		$tempCount++;	
+	} else {
+		$tempFlag = 0;
+		for ($x = 0; $x < count($tempArray); $x++){
+			if ($allSearches[$i]->termSearch == $tempArray[$x]->termSearch){
+				$tempFlag = 1;
+				break;
+			} else {
+				continue;
+			}
+		}
+		if ($tempFlag == 0){
+			array_push($tempArray,$allSearches[$i]);
+			$tempCount++;
+		}
+	}
+	
+}
+
+foreach ($tempArray as $indivSearch){
+	echo $indivSearch->termSearch;
+}
+
+
+if(!empty($getTermSearches)) {
+	echo "<p>You've recently searched for: </p>";
+	foreach($getTermSearches as $searchTerm) {
+		if($count != 3) {
+			if(empty($recent3Searches)) {
+				array_push($recent3Searches, $searchTerm['termSearch']);
+				$count++;
+			}else{
+				for($i=0; $i < count($recent3Searches); $i++) {
+					if($searchTerm['termSearch'] == $recent3Searches[$i]) {
+						break;
+					}
+
+					array_push($recent3Searches, $searchTerm['termSearch']);
+					$count++;
+
+				}
+			}
+		}
+	}
+
+	for($i=0; $i < count($recent3Searches); $i++) {
+		echo $recent3Searches[$i];
+	}
+}
+
 //$filter = ['email'=>'abced@email.com'];
-$options = [];
+
 
 /*********************************/
 // for loop print everything
@@ -15,7 +103,7 @@ $filter = [
 	]
 ];*/
 
-
+/*
 
 $filter = ['name' => new MongoDB\BSON\Regex(".*marina.*","i")];
 
@@ -28,7 +116,7 @@ foreach ($searchFoodEstablishments as $document) {
     echo $document->name."<br>";
 }
 
-
+*/
 //$query = new \MongoDB\Driver\Query([]);
 //$rows = $mongodbManager->executeQuery('foodfinderapp.carpark', $query);
 /*
