@@ -16,7 +16,7 @@
       <li><a href="404.php">Contact</a></li>
       <li class="float-right"><a href="https://www.facebook.com/FoodPark-155133068553033/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
       <li class="float-right"><a href="404.php"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-      <li class="float-right"><a href="404.php"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+      <li class="float-right"><a href="mailto:foodparkco@gmail.com?subject=Foodpark Feedback/Enquiries"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
       <li class="float-right"><a href="404.php"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
     </ul>
   </div>

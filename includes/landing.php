@@ -26,5 +26,5 @@ if(isset($_GET['message'])){
   </div>
 </section>
 <section class="container-news">
-  <p>The fastest growing startup in based in Singapore!</p>
+  <p>The fastest growing startup based in Singapore!</p>
 </section>

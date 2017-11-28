@@ -2,14 +2,18 @@
 <?php include_once 'protected/databaseconnection.php' ?>
 
 <?php
-if(isset($_SESSION['FIRSTNAME']))
+if(isset($_SESSION['FIRSTNAME'])) {
+
 include_once 'includes/nav_user.php';
-else
+
+}
+else {
 include_once 'includes/nav_index.php';
+}
 ?>
 
 <?php
-if(isset($_SESSION['ID'])) {
+if(isset($_SESSION['FIRSTNAME'])) {
   include_once 'includes/dashboard.php';
 } else {
   include_once 'includes/landing.php';

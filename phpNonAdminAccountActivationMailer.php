@@ -36,7 +36,7 @@ Password: '.$_POST["passwordConfirm"].'<br>
 
 Please click this link to activate your account:<br>
 
-<a href="http://47.74.176.60/userAccountVerification.php?email='.$_POST["email"].'&hash='.$hash.'">http://47.74.176.60/userAccountVerification.php?email='.$_POST["email"].'&hash='.$hash.'</a><br><br>
+<a href="http://localhost/2103mongo/userAccountVerification.php?email='.$_POST["email"].'&hash='.$hash.'">http://localhost/2103mongo/userAccountVerification.php?email='.$_POST["email"].'&hash='.$hash.'</a><br><br>
 
 ';
 
