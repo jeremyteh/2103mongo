@@ -175,7 +175,7 @@ $datetime = date('Y-m-d H:i:s');
                 try {
                     $result = $mongodbManager->executeBulkWrite('foodfinderapp.carparksearch', $bulk);
                 } catch (MongoDB\Driver\Exception\BulkWriteException $e) {
-                    $result = var_dump($e->getWriteResult());
+                    //$result = var_dump($e->getWriteResult());
                 }
               }
 
